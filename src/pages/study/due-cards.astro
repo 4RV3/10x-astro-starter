@@ -1,0 +1,9 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import ReviewSession from "../../components/study/ReviewSession";
+---
+
+<AppLayout>
+  <h1 class="text-xl font-semibold mb-4">Powtórki</h1>
+  <ReviewSession client:load />
+</AppLayout>

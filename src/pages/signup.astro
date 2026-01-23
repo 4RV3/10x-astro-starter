@@ -1,0 +1,12 @@
+---
+import AuthLayout from "../layouts/AuthLayout.astro";
+import SignupForm from "../components/auth/SignupForm";
+export const prerender = false;
+---
+
+<AuthLayout title="Załóż konto" subtitle="Utwórz darmowe konto, aby korzystać z aplikacji.">
+  <SignupForm client:load />
+  <div slot="footer" class="mt-3 text-center text-sm text-gray-600">
+    Masz już konto? <a class="underline" href="/login">Zaloguj się</a>
+  </div>
+</AuthLayout>

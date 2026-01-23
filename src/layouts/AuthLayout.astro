@@ -1,0 +1,33 @@
+---
+import "../styles/global.css";
+interface Props {
+  title?: string;
+  subtitle?: string;
+}
+const { title = "", subtitle = "" } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <title>{title ? `${title} • 10x Cards` : '10x Cards'}</title>
+  </head>
+  <body class="min-h-screen bg-gray-50 text-gray-900">
+    <main role="main" class="min-h-screen flex items-center justify-center p-6">
+      <div class="w-full max-w-md">
+        <slot name="header" />
+        <div class="bg-white border shadow-sm rounded-xl p-6">
+          {title && <h1 class="text-xl font-semibold mb-1">{title}</h1>}
+          {subtitle && <p class="text-sm text-gray-600 mb-4">{subtitle}</p>}
+          <section role="form">
+            <slot />
+          </section>
+        </div>
+        <slot name="footer" />
+      </div>
+    </main>
+  </body>
+</html>

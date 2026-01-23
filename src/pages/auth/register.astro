@@ -1,0 +1,11 @@
+---
+import AuthLayout from "../../layouts/AuthLayout.astro";
+import RegisterForm from "../../components/auth/RegisterForm";
+---
+
+<AuthLayout title="Załóż konto" subtitle="Utwórz darmowe konto, aby korzystać z aplikacji.">
+  <RegisterForm client:load />
+  <div slot="footer" class="mt-3 text-center text-sm text-gray-600">
+    Masz już konto? <a class="underline" href="/auth/login">Zaloguj się</a>
+  </div>
+</AuthLayout>

@@ -1,0 +1,9 @@
+---
+import AuthLayout from "../../../layouts/AuthLayout.astro";
+import ResetPasswordForm from "../../../components/auth/ResetPasswordForm";
+export const prerender = false;
+---
+
+<AuthLayout title="Ustaw nowe hasło" subtitle="Wprowadź nowe hasło do swojego konta.">
+  <ResetPasswordForm client:load />
+</AuthLayout>

@@ -1,0 +1,9 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import CardsList from "../../components/cards/CardsList";
+---
+
+<AppLayout>
+  <h1 class="text-xl font-semibold mb-4">Fiszki</h1>
+  <CardsList client:load />
+</AppLayout>

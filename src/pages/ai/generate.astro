@@ -1,0 +1,10 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import Generator from "../../components/ai/Generator";
+export const prerender = false;
+---
+
+<AppLayout>
+  <h1 class="text-xl font-semibold mb-4">Generator AI</h1>
+  <Generator client:load />
+</AppLayout>

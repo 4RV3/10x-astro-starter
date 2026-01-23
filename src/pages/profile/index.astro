@@ -1,0 +1,25 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+---
+
+<AppLayout>
+  <h1 class="text-xl font-semibold mb-4">Profil</h1>
+  <form class="max-w-md grid gap-3" id="profile-form">
+    <input name="username" placeholder="Nazwa użytkownika" class="border rounded px-3 py-2" required />
+    <button type="submit" class="px-3 py-2 bg-black text-white rounded">Zapisz</button>
+    <div id="msg" class="text-sm"></div>
+  </form>
+  <script>
+    const form = document.getElementById('profile-form');
+    const msg = document.getElementById('msg');
+    (async () => { try { const r = await fetch('/api/profiles/me'); const d = await r.json(); form.username.value = d.username || ''; } catch {} })();
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const body = Object.fromEntries(fd.entries());
+      const res = await fetch('/api/profiles/me', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (res.status === 409) { msg.textContent = 'Nazwa zajęta.'; return; }
+      msg.textContent = res.ok ? 'Zapisano.' : 'Błąd.';
+    });
+  </script>
+</AppLayout>

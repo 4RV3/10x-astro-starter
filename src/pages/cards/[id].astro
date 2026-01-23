@@ -1,0 +1,10 @@
+---
+import AppLayout from "../../layouts/AppLayout.astro";
+import CardDetail from "../../components/cards/CardDetail";
+const { id } = Astro.params;
+---
+
+<AppLayout>
+  <h1 class="text-xl font-semibold mb-4">Fiszka</h1>
+  <CardDetail client:load id={id} />
+</AppLayout>
