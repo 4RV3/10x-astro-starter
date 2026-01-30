@@ -84,6 +84,17 @@ fi
 
 set +a
 
+# Check if there are unhealthy containers from previous deployment
+echo "🔍 Checking for unhealthy containers..."
+UNHEALTHY=$(docker ps -a --filter "name=10xcards" --filter "health=unhealthy" -q)
+if [ -n "$UNHEALTHY" ]; then
+  echo "⚠️  Found unhealthy containers from previous deployment"
+  echo "🧹 Cleaning up before fresh deployment..."
+  docker compose -f "$COMPOSE_FILE" down -v
+  docker ps -aq --filter "name=10xcards" | xargs -r docker rm -f 2>/dev/null || true
+  echo "✅ Cleanup complete"
+fi
+
 # Pull latest image
 echo "📦 Pulling latest Docker image..."
 docker compose -f "$COMPOSE_FILE" pull app
