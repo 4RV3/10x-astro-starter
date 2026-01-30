@@ -56,7 +56,7 @@ Ten dokument zawiera:
 ### 1. Na VPS utwórz pliki secrets
 
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 sudo mkdir -p /opt/10xcards/secrets
 sudo chown -R $USER:$USER /opt/10xcards
 cd /opt/10xcards
@@ -126,7 +126,7 @@ Powinieneś zobaczyć:
 
 ### Sprawdź zawartość (bez wartości):
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129 "cat /opt/10xcards/secrets/supabase.env | grep -v '^#' | cut -d'=' -f1"
+ssh user@hostname -p port "cat /opt/10xcards/secrets/supabase.env | grep -v '^#' | cut -d'=' -f1"
 ```
 
 Powinno pokazać:
@@ -159,7 +159,7 @@ Port 54321 jest wystawiony. Możesz otworzyć w firewall: `sudo ufw allow 54321/
 
 **Q: Jak dostać się do PostgreSQL?**
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 docker exec -it 10xcards-db-1 psql -U postgres
 ```
 

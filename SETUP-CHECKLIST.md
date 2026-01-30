@@ -12,7 +12,7 @@ ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions_key
 
 ### Krok 1.2: Dodaj klucz na VPS
 ```bash
-ssh-copy-id -i ~/.ssh/github_actions_key.pub -p 10129 erntoto@srv26.mikr.us
+ssh-copy-id -i ~/.ssh/github_actions_key.pub -p port user@hostname
 ```
 - [ ] Klucz skopiowany na VPS
 
@@ -29,22 +29,22 @@ Dodaj następujące secrets:
    - [ ] Secret `VPS_SSH_KEY` dodany
 
 2. **VPS_HOST**  
-   Wartość: `srv26.mikr.us`
+   Wartość: `hostname`
    - [ ] Secret `VPS_HOST` dodany
 
 3. **VPS_USER**  
-   Wartość: `erntoto`
+   Wartość: `user`
    - [ ] Secret `VPS_USER` dodany
 
 4. **VPS_SSH_PORT**  
-   Wartość: `10129`
+   Wartość: `port`
    - [ ] Secret `VPS_SSH_PORT` dodany
 
 ## ☑️ Etap 2: Setup VPS (10 min)
 
 ### Krok 2.1: Połącz się z VPS
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 ```
 - [ ] Połączono z VPS
 
@@ -164,16 +164,16 @@ Poczekaj na wykonanie wszystkich jobów:
 ### Krok 4.3: Weryfikacja
 ```bash
 # Sprawdź z zewnątrz
-curl http://srv26.mikr.us:8080/
+curl http://example.com:8080/
 
 # Lub w przeglądarce
-open http://srv26.mikr.us:8080/
+open http://example.com:8080/
 ```
 - [ ] Aplikacja działa na VPS
 
 ### Krok 4.4: Sprawdź logi (opcjonalnie)
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 cd /opt/10xcards
 docker compose -f docker-compose.production.yml logs -f
 ```
@@ -212,4 +212,4 @@ Sprawdź sekcje "Troubleshooting" w:
 
 Lub sprawdź logi:
 - GitHub Actions: https://github.com/4RV3/10x-astro-starter/actions
-- VPS: `ssh erntoto@srv26.mikr.us -p 10129 "cd /opt/10xcards && docker compose -f docker-compose.production.yml logs"`
+- VPS: `ssh user@hostname -p port "cd /opt/10xcards && docker compose -f docker-compose.production.yml logs"`

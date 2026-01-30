@@ -44,14 +44,14 @@ W GitHub (Settings → Secrets and variables → Actions) dodaj:
    Dodaj jako `VPS_SSH_KEY`
 
 2. **Dodaj pozostałe secrets:**
-   - `VPS_HOST` = `srv26.mikr.us`
-   - `VPS_USER` = `erntoto`
-   - `VPS_SSH_PORT` = `10129`
+   - `VPS_HOST` = `hostname`
+   - `VPS_USER` = `user`
+   - `VPS_SSH_PORT` = `port`
 
 ### 2. Setup na VPS
 ```bash
 # 1. Połącz się z VPS
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 
 # 2. Utwórz katalog
 sudo mkdir -p /opt/10xcards/secrets
@@ -151,7 +151,7 @@ Push do main/master
 
 ```bash
 # Na VPS sprawdź status
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 cd /opt/10xcards
 docker compose -f docker-compose.production.yml ps
 
@@ -159,7 +159,7 @@ docker compose -f docker-compose.production.yml ps
 docker compose -f docker-compose.production.yml logs -f
 
 # Test z zewnątrz
-curl http://srv26.mikr.us:8080/
+curl http://example.com:8080/
 ```
 
 ## 🎯 Wymogi spełnione:

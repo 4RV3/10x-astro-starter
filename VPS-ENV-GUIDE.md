@@ -36,7 +36,7 @@ SUPABASE_URL=http://kong:8000
 
 ### 1. Połącz się z VPS
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 ```
 
 ### 2. Utwórz strukturę katalogów
@@ -198,7 +198,7 @@ GitHub Actions automatycznie:
 
 ### Na VPS:
 ```bash
-ssh erntoto@srv26.mikr.us -p 10129
+ssh user@hostname -p port
 cd /opt/10xcards
 
 # Status wszystkich kontenerów
@@ -217,10 +217,10 @@ curl http://localhost:8080/
 ### Z zewnątrz:
 ```bash
 # Aplikacja
-curl http://srv26.mikr.us:8080/
+curl http://example.com:8080/
 
 # Supabase API (jeśli port otwarty)
-curl http://srv26.mikr.us:54321/
+curl http://example.com:54321/
 ```
 
 ## 🔧 Przydatne komendy
