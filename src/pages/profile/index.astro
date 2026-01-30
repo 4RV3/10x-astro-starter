@@ -10,16 +10,29 @@ import AppLayout from "../../layouts/AppLayout.astro";
     <div id="msg" class="text-sm"></div>
   </form>
   <script>
-    const form = document.getElementById('profile-form');
-    const msg = document.getElementById('msg');
-    (async () => { try { const r = await fetch('/api/profiles/me'); const d = await r.json(); form.username.value = d.username || ''; } catch {} })();
-    form?.addEventListener('submit', async (e) => {
+    const form = document.getElementById("profile-form");
+    const msg = document.getElementById("msg");
+    (async () => {
+      try {
+        const r = await fetch("/api/profiles/me");
+        const d = await r.json();
+        form.username.value = d.username || "";
+      } catch {}
+    })();
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
       const body = Object.fromEntries(fd.entries());
-      const res = await fetch('/api/profiles/me', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (res.status === 409) { msg.textContent = 'Nazwa zajęta.'; return; }
-      msg.textContent = res.ok ? 'Zapisano.' : 'Błąd.';
+      const res = await fetch("/api/profiles/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.status === 409) {
+        msg.textContent = "Nazwa zajęta.";
+        return;
+      }
+      msg.textContent = res.ok ? "Zapisano." : "Błąd.";
     });
   </script>
 </AppLayout>

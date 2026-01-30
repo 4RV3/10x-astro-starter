@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const generateCardsCommandSchema = z.object({
-  input_text: z.string().trim().min(1, 'Input text is required').max(8000),
+  input_text: z.string().trim().min(1, "Input text is required").max(8000),
 });
 
 export const aiCardProposalSchema = z.object({
@@ -11,5 +11,5 @@ export const aiCardProposalSchema = z.object({
 });
 
 export const saveAICardsBatchCommandSchema = z.object({
-  cards: z.array(aiCardProposalSchema).min(1, 'Cards batch cannot be empty'),
+  cards: z.array(aiCardProposalSchema).min(1, "Cards batch cannot be empty"),
 });

@@ -1,10 +1,10 @@
 import React from "react";
 import type { ListCardsQuery } from "../../types";
 
-type Props = {
+interface Props {
   value: Pick<ListCardsQuery, "origin" | "sort">;
   onChange: (q: Pick<ListCardsQuery, "origin" | "sort">) => void;
-};
+}
 
 export default function FiltersBar({ value, onChange }: Props) {
   return (

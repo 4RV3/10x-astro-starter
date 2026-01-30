@@ -2,11 +2,13 @@
 export const prerender = false;
 
 const supabase = Astro.locals.supabase;
-const { data: { user } } = await supabase.auth.getUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 
 if (user) {
-  return Astro.redirect('/study');
+  return Astro.redirect("/study");
 }
 
-return Astro.redirect('/auth/login');
+return Astro.redirect("/auth/login");
 ---

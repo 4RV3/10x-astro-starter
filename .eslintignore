@@ -1,0 +1,7 @@
+# Temporarily ignore files with prettier parsing issues
+src/layouts/AppLayout.astro
+src/layouts/Layout.astro
+src/pages/cards/new.astro
+src/pages/login.astro
+src/pages/profile/index.astro
+src/pages/register.astro

@@ -6,23 +6,37 @@ import AppLayout from "../../layouts/AppLayout.astro";
   <h1 class="text-xl font-semibold mb-4">Dodaj fiszkę ręcznie</h1>
   <form class="max-w-xl grid gap-3" id="card-form" aria-describedby="msg">
     <input name="front" placeholder="Front" class="border rounded px-3 py-2" required />
-    <textarea name="back" placeholder="Back" class="border rounded px-3 py-2 min-h-[120px]" required />
-    <textarea name="source_snippet" placeholder="Źródło (wymagane)" class="border rounded px-3 py-2 min-h-[80px]" required />
+    <textarea name="back" placeholder="Back" class="border rounded px-3 py-2 min-h-[120px]" required></textarea>
+    <textarea
+      name="source_snippet"
+      placeholder="Źródło (wymagane)"
+      class="border rounded px-3 py-2 min-h-[80px]"
+      required></textarea>
     <button type="submit" class="px-3 py-2 bg-black text-white rounded">Zapisz</button>
     <div id="msg" class="text-sm"></div>
   </form>
   <script>
-    const form = document.getElementById('card-form');
-    const msg = document.getElementById('msg');
-    form?.addEventListener('submit', async (e) => {
+    const form = document.getElementById("card-form");
+    const msg = document.getElementById("msg");
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
       const body = Object.fromEntries(fd.entries());
-      const res = await fetch('/api/cards', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (res.ok) { msg.textContent = 'Zapisano.'; form.reset(); }
-      else {
-        try { const data = await res.json(); msg.textContent = data?.message || 'Błąd zapisu.'; }
-        catch { msg.textContent = 'Błąd zapisu.'; }
+      const res = await fetch("/api/cards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        msg.textContent = "Zapisano.";
+        form.reset();
+      } else {
+        try {
+          const data = await res.json();
+          msg.textContent = data?.message || "Błąd zapisu.";
+        } catch {
+          msg.textContent = "Błąd zapisu.";
+        }
       }
     });
   </script>

@@ -37,7 +37,9 @@ export default function LoginForm() {
       if (!res.ok) {
         // Don't leak whether account exists; but do show configuration/server issues.
         let serverError: any = null;
-        try { serverError = await res.json(); } catch {}
+        try {
+          serverError = await res.json();
+        } catch {}
 
         if (res.status >= 500 && serverError?.message) {
           setError(serverError.message);
@@ -70,7 +72,9 @@ export default function LoginForm() {
         </div>
       )}
       <div className="grid gap-1.5">
-        <label htmlFor={userId} className="text-sm font-medium">Nazwa użytkownika</label>
+        <label htmlFor={userId} className="text-sm font-medium">
+          Nazwa użytkownika
+        </label>
         <input
           id={userId}
           name="username"
@@ -82,7 +86,9 @@ export default function LoginForm() {
         />
       </div>
       <div className="grid gap-1.5">
-        <label htmlFor={passId} className="text-sm font-medium">Hasło</label>
+        <label htmlFor={passId} className="text-sm font-medium">
+          Hasło
+        </label>
         <input
           id={passId}
           name="password"
@@ -94,7 +100,9 @@ export default function LoginForm() {
           required
         />
       </div>
-      <Button disabled={loading} aria-busy={loading} className="w-full">{loading ? "Logowanie…" : "Zaloguj się"}</Button>
+      <Button disabled={loading} aria-busy={loading} className="w-full">
+        {loading ? "Logowanie…" : "Zaloguj się"}
+      </Button>
     </form>
   );
 }

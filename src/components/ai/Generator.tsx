@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { apiFetch } from "../../lib/http";
 
-type Proposal = { front: string; back: string; source_snippet?: string };
+interface Proposal {
+  front: string;
+  back: string;
+  source_snippet?: string;
+}
 
-type Notice = { variant: "success" | "error"; message: string };
+interface Notice {
+  variant: "success" | "error";
+  message: string;
+}
 
 export default function Generator() {
   const [text, setText] = useState("");
@@ -102,16 +109,18 @@ export default function Generator() {
         ) : (
           <div className="grid gap-3">
             <div className="flex gap-2">
-              <button onClick={saveAll} className="px-3 py-2 bg-black text-white rounded">Zapisz wszystkie</button>
-              <button onClick={() => setProposals([])} className="px-3 py-2 border rounded">Odrzuć wyniki</button>
+              <button onClick={saveAll} className="px-3 py-2 bg-black text-white rounded">
+                Zapisz wszystkie
+              </button>
+              <button onClick={() => setProposals([])} className="px-3 py-2 border rounded">
+                Odrzuć wyniki
+              </button>
             </div>
             {proposals.map((p, i) => (
               <div key={i} className="p-3 border rounded bg-white">
                 <div className="font-medium">{p.front}</div>
                 <div className="mt-2 text-gray-700 whitespace-pre-wrap">{p.back}</div>
-                {p.source_snippet && (
-                  <div className="mt-2 text-xs text-gray-500">{p.source_snippet}</div>
-                )}
+                {p.source_snippet && <div className="mt-2 text-xs text-gray-500">{p.source_snippet}</div>}
               </div>
             ))}
           </div>

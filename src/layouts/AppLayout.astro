@@ -1,7 +1,9 @@
 ---
 import "../styles/global.css";
 const supabase = Astro.locals.supabase;
-const { data: { user } } = await supabase.auth.getUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 ---
 
 <!doctype html>
@@ -24,11 +26,17 @@ const { data: { user } } = await supabase.auth.getUser();
             <a href="/cards/new" class="hover:underline">Dodaj ręcznie</a>
             <a href="/profile" class="hover:underline">Profil</a>
           </nav>
-          {user ? (
-            <button data-action="logout" class="text-sm px-3 py-1.5 rounded border hover:bg-gray-50">Wyloguj</button>
-          ) : (
-            <a href="/auth/login" class="text-sm px-3 py-1.5 rounded border hover:bg-gray-50">Zaloguj</a>
-          )}
+          {
+            user ? (
+              <button data-action="logout" class="text-sm px-3 py-1.5 rounded border hover:bg-gray-50">
+                Wyloguj
+              </button>
+            ) : (
+              <a href="/auth/login" class="text-sm px-3 py-1.5 rounded border hover:bg-gray-50">
+                Zaloguj
+              </a>
+            )
+          }
         </div>
       </div>
     </header>
@@ -41,19 +49,27 @@ const { data: { user } } = await supabase.auth.getUser();
         <a href="/cards" class="py-3">Fiszki</a>
         <a href="/ai/generate" class="py-3">AI</a>
         <a href="/cards/new" class="py-3">Dodaj</a>
-        {user ? (
-          <button data-action="logout" class="py-3">Wyloguj</button>
-        ) : (
-          <a href="/auth/login" class="py-3">Profil</a>
-        )}
+        {
+          user ? (
+            <button data-action="logout" class="py-3">
+              Wyloguj
+            </button>
+          ) : (
+            <a href="/auth/login" class="py-3">
+              Profil
+            </a>
+          )
+        }
       </div>
     </nav>
     <script>
       for (const el of document.querySelectorAll('[data-action="logout"]')) {
-        el.addEventListener('click', async (e) => {
+        el.addEventListener("click", async (e) => {
           e.preventDefault();
-          try { await fetch('/api/auth/logout', { method: 'POST' }); } catch {}
-          window.location.href = '/auth/login';
+          try {
+            await fetch("/api/auth/logout", { method: "POST" });
+          } catch {}
+          window.location.href = "/auth/login";
         });
       }
     </script>

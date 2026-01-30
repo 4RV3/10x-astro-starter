@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { apiFetch } from "../../lib/http";
 
-type Card = { id: string; front: string; back: string; source_snippet?: string };
+interface Card {
+  id: string;
+  front: string;
+  back: string;
+  source_snippet?: string;
+}
 
 export default function ReviewSession() {
   const [cards, setCards] = useState<Card[]>([]);
@@ -33,8 +38,12 @@ export default function ReviewSession() {
       <div className="grid gap-4">
         <div className="text-center text-sm text-gray-600">Brak fiszek do powtórki.</div>
         <div className="flex flex-wrap gap-2 justify-center">
-          <a href="/ai/generate" className="px-3 py-2 bg-black text-white rounded">Wygeneruj fiszki z tekstu</a>
-          <a href="/cards/new" className="px-3 py-2 border rounded">Dodaj fiszkę ręcznie</a>
+          <a href="/ai/generate" className="px-3 py-2 bg-black text-white rounded">
+            Wygeneruj fiszki z tekstu
+          </a>
+          <a href="/cards/new" className="px-3 py-2 border rounded">
+            Dodaj fiszkę ręcznie
+          </a>
         </div>
       </div>
     );
@@ -54,8 +63,10 @@ export default function ReviewSession() {
       </div>
       {showBack && (
         <div className="flex flex-wrap gap-2">
-          {[0,1,2,3,4,5].map((s) => (
-            <button key={s} onClick={() => rate(s)} className="px-3 py-2 border rounded hover:bg-gray-50">{s}</button>
+          {[0, 1, 2, 3, 4, 5].map((s) => (
+            <button key={s} onClick={() => rate(s)} className="px-3 py-2 border rounded hover:bg-gray-50">
+              {s}
+            </button>
           ))}
         </div>
       )}

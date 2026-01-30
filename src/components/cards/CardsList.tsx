@@ -2,7 +2,13 @@ import React, { useEffect, useState } from "react";
 import { apiFetch } from "../../lib/http";
 import FiltersBar from "./FiltersBar";
 
-type Card = { id: string; front: string; back: string; origin?: "manual"|"ai"; created_at?: string };
+interface Card {
+  id: string;
+  front: string;
+  back: string;
+  origin?: "manual" | "ai";
+  created_at?: string;
+}
 
 type ListResponse = { data: Card[]; pagination: { page: number; page_size: number; total_pages: number } } | Card[];
 
@@ -30,16 +36,24 @@ export default function CardsList() {
     }
   };
 
-  useEffect(() => { load(true); /* initial */ }, []);
+  useEffect(() => {
+    load(true); /* initial */
+  }, []);
 
   return (
     <div className="grid gap-4">
       <div className="flex items-center gap-2">
         <FiltersBar
           value={{ origin: (origin || undefined) as any, sort: sort as any }}
-          onChange={(v) => { setOrigin(v.origin || ""); setSort(v.sort || "created_at_desc"); load(true); }}
+          onChange={(v) => {
+            setOrigin(v.origin || "");
+            setSort(v.sort || "created_at_desc");
+            load(true);
+          }}
         />
-        <a href="/cards/new" className="ml-auto px-3 py-2 bg-black text-white rounded text-sm">Dodaj fiszkę</a>
+        <a href="/cards/new" className="ml-auto px-3 py-2 bg-black text-white rounded text-sm">
+          Dodaj fiszkę
+        </a>
       </div>
       {items.map((c) => (
         <div key={c.id} className="p-3 border rounded bg-white">
@@ -47,7 +61,9 @@ export default function CardsList() {
           <div className="mt-1 text-sm text-gray-700 line-clamp-2">{c.back}</div>
           <div className="mt-2 text-xs text-gray-500">{c.created_at}</div>
           <div className="mt-2 flex gap-2">
-            <a href={`/cards/${c.id}`} className="px-2 py-1 border rounded text-xs">Podgląd/Edycja</a>
+            <a href={`/cards/${c.id}`} className="px-2 py-1 border rounded text-xs">
+              Podgląd/Edycja
+            </a>
             <button
               onClick={async () => {
                 if (!confirm("Usunąć tę fiszkę?")) return;
@@ -55,12 +71,16 @@ export default function CardsList() {
                 if (res.ok) setItems((prev) => prev.filter((x) => x.id !== c.id));
               }}
               className="px-2 py-1 bg-red-600 text-white rounded text-xs"
-            >Usuń</button>
+            >
+              Usuń
+            </button>
           </div>
         </div>
       ))}
       {hasMore && (
-        <button onClick={() => load(false)} className="px-3 py-2 border rounded w-full md:w-auto">Załaduj więcej</button>
+        <button onClick={() => load(false)} className="px-3 py-2 border rounded w-full md:w-auto">
+          Załaduj więcej
+        </button>
       )}
     </div>
   );

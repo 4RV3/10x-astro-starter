@@ -4,60 +4,68 @@
   Note: Ensure OPENROUTER_API_KEY is set server-side (import.meta.env). Never expose it to the client.
 */
 
-export type ModelParams = {
+export interface ModelParams {
   temperature?: number; // 0–2
-  top_p?: number;       // 0–1
-  max_tokens?: number;  // > 0
+  top_p?: number; // 0–1
+  max_tokens?: number; // > 0
   presence_penalty?: number;
   frequency_penalty?: number;
-};
+}
 
-export type ResponseFormatSchema = {
-  type: 'json_schema';
+export interface ResponseFormatSchema {
+  type: "json_schema";
   json_schema: {
     name: string;
     strict: true;
     schema: Record<string, unknown>;
   };
-};
+}
 
-export type ChatMessage = {
-  role: 'system' | 'user' | 'assistant' | 'tool';
+export interface ChatMessage {
+  role: "system" | "user" | "assistant" | "tool";
   content: string;
-};
+}
 
-export type CompletionOptions = {
+export interface CompletionOptions {
   model?: string;
   params?: ModelParams;
   response_format?: ResponseFormatSchema;
   stream?: boolean;
   signal?: AbortSignal;
-};
+}
 
 export class OpenRouterService {
-  constructor(private cfg: {
-    apiKey?: string;
-    baseUrl?: string;
-    defaultModel?: string;
-    defaultParams?: ModelParams;
-    fetchImpl?: typeof fetch; // dependency injection for tests
-  }) {}
+  constructor(
+    private cfg: {
+      apiKey?: string;
+      baseUrl?: string;
+      defaultModel?: string;
+      defaultParams?: ModelParams;
+      fetchImpl?: typeof fetch; // dependency injection for tests
+    }
+  ) {}
 
   // Private configuration
   private readonly apiKey = this.cfg.apiKey ?? (import.meta as any)?.env?.OPENROUTER_API_KEY;
   private readonly _fetch: typeof fetch = this.cfg.fetchImpl ?? fetch;
-  private readonly _baseUrl = this.cfg.baseUrl ?? 'https://openrouter.ai/api/v1';
-  private _defaultModel = this.cfg.defaultModel ?? 'openai/gpt-4o-mini';
+  private readonly _baseUrl = this.cfg.baseUrl ?? "https://openrouter.ai/api/v1";
+  private _defaultModel = this.cfg.defaultModel ?? "openai/gpt-4o-mini";
   private _defaultParams: ModelParams = this.cfg.defaultParams ?? { temperature: 0.2, max_tokens: 512 };
 
   // Public readonly getters
-  get baseUrl(): string { return this._baseUrl; }
-  get defaultModel(): string { return this._defaultModel; }
-  get defaultParams(): ModelParams { return this._defaultParams; }
+  get baseUrl(): string {
+    return this._baseUrl;
+  }
+  get defaultModel(): string {
+    return this._defaultModel;
+  }
+  get defaultParams(): ModelParams {
+    return this._defaultParams;
+  }
 
   // Public setters
   setDefaultModel(model: string): void {
-    if (!model || typeof model !== 'string') throw new Error('Model name must be a non-empty string');
+    if (!model || typeof model !== "string") throw new Error("Model name must be a non-empty string");
     this._defaultModel = model;
   }
   setDefaultParams(params: ModelParams): void {
@@ -69,28 +77,28 @@ export class OpenRouterService {
     messages: ChatMessage[],
     opt?: CompletionOptions
   ): Promise<{ text: string; raw: unknown; structured?: unknown }> {
-    if (!Array.isArray(messages) || messages.length === 0) throw new Error('messages must be a non-empty array');
+    if (!Array.isArray(messages) || messages.length === 0) throw new Error("messages must be a non-empty array");
     const url = `${this._baseUrl}/chat/completions`;
     const payload = this.buildPayload(messages, opt);
-    const init: RequestInit = { method: 'POST', headers: this.makeHeaders(), body: payload, signal: opt?.signal };
+    const init: RequestInit = { method: "POST", headers: this.makeHeaders(), body: payload, signal: opt?.signal };
     return this.requestJsonWithRetry(url, init, opt?.response_format);
   }
 
   // Public API: streaming completion via SSE-like response
   async streamChat(
     messages: ChatMessage[],
-    opt?: CompletionOptions & { onToken: (t: string) => void; onDone?: () => void; onError?: (e: unknown) => void; }
+    opt?: CompletionOptions & { onToken: (t: string) => void; onDone?: () => void; onError?: (e: unknown) => void }
   ): Promise<void> {
-    if (!Array.isArray(messages) || messages.length === 0) throw new Error('messages must be a non-empty array');
-    if (!opt?.onToken) throw new Error('onToken callback is required for streaming');
+    if (!Array.isArray(messages) || messages.length === 0) throw new Error("messages must be a non-empty array");
+    if (!opt?.onToken) throw new Error("onToken callback is required for streaming");
 
     const url = `${this._baseUrl}/chat/completions`;
     const payload = this.buildPayload(messages, { ...opt, stream: true });
-    const init: RequestInit = { method: 'POST', headers: this.makeHeaders(), body: payload, signal: opt?.signal };
+    const init: RequestInit = { method: "POST", headers: this.makeHeaders(), body: payload, signal: opt?.signal };
 
     const resp = await this.fetchWithRetry(url, init);
     if (!resp.ok || !resp.body) {
-      const txt = await safeReadText(resp).catch(() => '');
+      const txt = await safeReadText(resp).catch(() => "");
       throw new Error(`OpenRouter stream error ${resp.status}: ${txt}`);
     }
 
@@ -101,14 +109,17 @@ export class OpenRouterService {
         const { value, done } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value, { stream: true });
-        for (const line of chunk.split('\n')) {
-          if (!line.startsWith('data:')) continue;
+        for (const line of chunk.split("\n")) {
+          if (!line.startsWith("data:")) continue;
           const data = line.slice(5).trim();
           if (!data) continue;
-          if (data === '[DONE]') { opt.onDone?.(); return; }
+          if (data === "[DONE]") {
+            opt.onDone?.();
+            return;
+          }
           try {
             const json = JSON.parse(data);
-            const token: string = json?.choices?.[0]?.delta?.content ?? '';
+            const token: string = json?.choices?.[0]?.delta?.content ?? "";
             if (token) opt.onToken(token);
           } catch {
             // ignore non-JSON fragments
@@ -126,20 +137,20 @@ export class OpenRouterService {
 
   // Private helpers
   private makeHeaders() {
-    if (!this.apiKey) throw new Error('OPENROUTER_API_KEY not configured');
+    if (!this.apiKey) throw new Error("OPENROUTER_API_KEY not configured");
     return {
       Authorization: `Bearer ${this.apiKey}`,
-      'Content-Type': 'application/json',
-      'X-Title': '10x Astro Starter',
-      Accept: 'application/json'
+      "Content-Type": "application/json",
+      "X-Title": "10x Astro Starter",
+      Accept: "application/json",
     } as const;
   }
 
   private validateParams(p?: ModelParams): ModelParams {
     const m = { ...this._defaultParams, ...(p ?? {}) };
-    if (m.temperature != null && (m.temperature < 0 || m.temperature > 2)) throw new Error('Invalid temperature');
-    if (m.top_p != null && (m.top_p < 0 || m.top_p > 1)) throw new Error('Invalid top_p');
-    if (m.max_tokens != null && m.max_tokens <= 0) throw new Error('Invalid max_tokens');
+    if (m.temperature != null && (m.temperature < 0 || m.temperature > 2)) throw new Error("Invalid temperature");
+    if (m.top_p != null && (m.top_p < 0 || m.top_p > 1)) throw new Error("Invalid top_p");
+    if (m.max_tokens != null && m.max_tokens <= 0) throw new Error("Invalid max_tokens");
     return m;
   }
 
@@ -160,14 +171,18 @@ export class OpenRouterService {
 
   private async handleResponse(resp: Response, response_format?: ResponseFormatSchema) {
     if (!resp.ok) {
-      const txt = await safeReadText(resp).catch(() => '');
+      const txt = await safeReadText(resp).catch(() => "");
       throw new Error(`OpenRouter error ${resp.status}: ${txt}`);
     }
     const json = await resp.json();
-    const text: string = json?.choices?.[0]?.message?.content ?? '';
+    const text: string = json?.choices?.[0]?.message?.content ?? "";
     let structured: unknown;
     if (response_format?.json_schema?.strict) {
-      try { structured = text ? JSON.parse(text) : undefined; } catch { /* ignore parse error */ }
+      try {
+        structured = text ? JSON.parse(text) : undefined;
+      } catch {
+        /* ignore parse error */
+      }
     }
     return { text, raw: json, structured };
   }
@@ -202,9 +217,13 @@ export class OpenRouterService {
 }
 
 async function safeReadText(resp: Response): Promise<string> {
-  try { return await resp.text(); } catch { return ''; }
+  try {
+    return await resp.text();
+  } catch {
+    return "";
+  }
 }
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(res => setTimeout(res, ms));
+  return new Promise((res) => setTimeout(res, ms));
 }

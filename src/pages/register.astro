@@ -8,7 +8,13 @@ import AppLayout from "../layouts/AppLayout.astro";
     <input name="email" type="email" placeholder="Email" class="border rounded px-3 py-2" required />
     <input name="username" placeholder="Nazwa użytkownika" class="border rounded px-3 py-2" required />
     <input name="password" type="password" placeholder="Hasło" class="border rounded px-3 py-2" required />
-    <input name="confirmPassword" type="password" placeholder="Powtórz hasło" class="border rounded px-3 py-2" required />
+    <input
+      name="confirmPassword"
+      type="password"
+      placeholder="Powtórz hasło"
+      class="border rounded px-3 py-2"
+      required
+    />
     <button type="submit" class="px-3 py-2 bg-black text-white rounded">Zarejestruj</button>
     <div id="msg" class="text-sm"></div>
     <div class="text-sm">
@@ -16,18 +22,31 @@ import AppLayout from "../layouts/AppLayout.astro";
     </div>
   </form>
   <script>
-    const form = document.getElementById('register-form');
-    const msg = document.getElementById('msg');
-    form?.addEventListener('submit', async (e) => {
+    const form = document.getElementById("register-form");
+    const msg = document.getElementById("msg");
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
       const body = Object.fromEntries(fd.entries());
-      if (body.password !== body.confirmPassword) { msg.textContent = 'Hasła nie są zgodne.'; return; }
+      if (body.password !== body.confirmPassword) {
+        msg.textContent = "Hasła nie są zgodne.";
+        return;
+      }
       const { confirmPassword, ...payload } = body;
-      const res = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (res.status === 409) { msg.textContent = 'Nazwa użytkownika lub email zajęte.'; return; }
-      if (res.ok) { window.location.href = '/study'; }
-      else { msg.textContent = 'Błąd rejestracji.'; }
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 409) {
+        msg.textContent = "Nazwa użytkownika lub email zajęte.";
+        return;
+      }
+      if (res.ok) {
+        window.location.href = "/study";
+      } else {
+        msg.textContent = "Błąd rejestracji.";
+      }
     });
   </script>
 </AppLayout>

@@ -14,15 +14,22 @@ import AppLayout from "../layouts/AppLayout.astro";
     </div>
   </form>
   <script>
-    const form = document.getElementById('login-form');
-    const msg = document.getElementById('msg');
-    form?.addEventListener('submit', async (e) => {
+    const form = document.getElementById("login-form");
+    const msg = document.getElementById("msg");
+    form?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const fd = new FormData(form);
       const body = Object.fromEntries(fd.entries());
-      const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (res.ok) { window.location.href = '/study'; }
-      else { msg.textContent = 'Nieprawidłowe dane logowania.'; }
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        window.location.href = "/study";
+      } else {
+        msg.textContent = "Nieprawidłowe dane logowania.";
+      }
     });
   </script>
 </AppLayout>
