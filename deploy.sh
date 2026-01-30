@@ -70,6 +70,29 @@ set -a  # automatically export all variables
 source secrets/supabase.env
 source secrets/app.env
 
+# URL-encode POSTGRES_PASSWORD for connection strings
+# Special characters like / and = need to be encoded
+urlencode() {
+    local string="$1"
+    local strlen=${#string}
+    local encoded=""
+    local pos c o
+    
+    for (( pos=0 ; pos<strlen ; pos++ )); do
+        c=${string:$pos:1}
+        case "$c" in
+            [-_.~a-zA-Z0-9] ) o="${c}" ;;
+            * ) printf -v o '%%%02x' "'$c"
+        esac
+        encoded+="${o}"
+    done
+    echo "${encoded}"
+}
+
+# Export URL-encoded version of password for connection strings
+export POSTGRES_PASSWORD_ENCODED=$(urlencode "$POSTGRES_PASSWORD")
+echo "🔑 URL-encoded database password for connection strings"
+
 # Set DOCKER_IMAGE if not already set (for manual runs)
 if [ -z "$DOCKER_IMAGE" ]; then
   # Try to detect from GitHub repository or use default
