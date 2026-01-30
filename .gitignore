@@ -16,6 +16,16 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+.env.local
+
+# local secrets (mounted on VPS)
+secrets/
+!secrets/*.example
+
+# test results
+test-results/
+playwright-report/
+playwright/.cache/
 
 # macOS-specific files
 .DS_Store

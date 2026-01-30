@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# build output
+/dist
+
+# tooling
+.git
+.gitignore
+.github
+
+# local env/secrets
+.env
+.env.*
+secrets
+
+# misc
+npm-debug.log*
+.DS_Store

@@ -1,0 +1,199 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Job 1: Lint and Build
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  # Job 2: Run Tests
+  test:
+    name: Run E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: npm run test
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  # Job 3: Build and Push Docker Image
+  docker:
+    name: Build & Push Docker Image
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  # Job 4: Deploy to VPS
+  deploy:
+    name: Deploy to VPS
+    needs: docker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Create deployment directory on VPS
+        run: |
+          ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            sudo mkdir -p /opt/10xcards
+            sudo chown $USER:$USER /opt/10xcards
+          EOF
+
+      - name: Copy deployment files to VPS
+        run: |
+          # Copy main deployment files
+          scp -P ${{ secrets.VPS_SSH_PORT }} \
+            docker-compose.production.yml \
+            deploy.sh \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/10xcards/
+          
+          # Copy docker directory (Supabase config)
+          scp -r -P ${{ secrets.VPS_SSH_PORT }} \
+            docker/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/10xcards/
+          
+          # Copy supabase migrations
+          scp -r -P ${{ secrets.VPS_SSH_PORT }} \
+            supabase/ \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/10xcards/
+
+      - name: Deploy application
+        run: |
+          ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /opt/10xcards
+            
+            # Check if secrets exist
+            if [ ! -f secrets/supabase.env ] || [ ! -f secrets/app.env ]; then
+              echo "⚠️  Warning: secrets/supabase.env or secrets/app.env not found."
+              echo "Please create these files with your configuration."
+              exit 1
+            fi
+            
+            # Set GITHUB_REPOSITORY for docker-compose
+            export GITHUB_REPOSITORY="${{ github.repository }}"
+            
+            # Run deployment script
+            chmod +x deploy.sh
+            ./deploy.sh
+          EOF
+
+      - name: Verify deployment
+        run: |
+          ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /opt/10xcards
+            docker compose -f docker-compose.production.yml ps
+            
+            # Wait for health check
+            echo "⏳ Waiting for application to be healthy..."
+            sleep 10
+            
+            # Check if container is running
+            if docker compose -f docker-compose.production.yml ps | grep -q "Up"; then
+              echo "✅ Application is running"
+            else
+              echo "❌ Application failed to start"
+              docker compose -f docker-compose.production.yml logs --tail=50
+              exit 1
+            fi
+          EOF

@@ -81,6 +81,13 @@ From `package.json`:
 - `npm run lint` — run ESLint
 - `npm run lint:fix` — run ESLint with auto-fix
 - `npm run format` — run Prettier
+- `npm run test` — run E2E tests with Playwright
+- `npm run test:ui` — run tests in interactive UI mode
+- `npm run test:debug` — debug tests step-by-step
+
+For more details on testing, see [TESTING.md](./TESTING.md).  
+For CI/CD setup instructions, see [CI-CD-SETUP.md](./CI-CD-SETUP.md).  
+For VPS environment configuration with Supabase in Docker, see [VPS-ENV-GUIDE.md](./VPS-ENV-GUIDE.md).
 
 ## Project scope
 
