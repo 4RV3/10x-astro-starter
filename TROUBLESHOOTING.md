@@ -1,5 +1,21 @@
 # Deployment Troubleshooting Guide
 
+## Important: Always load environment variables
+
+Before running any `docker compose` commands manually on VPS, **always** load environment variables:
+
+```bash
+cd /opt/10xcards
+source ./load-env.sh
+# Now you can run docker compose commands
+docker compose -f docker-compose.production.yml ps
+```
+
+This loads:
+- Variables from `secrets/supabase.env` and `secrets/app.env`
+- URL-encoded `POSTGRES_PASSWORD_ENCODED`
+- `DOCKER_IMAGE` variable
+
 ## Quick Cleanup Commands
 
 ### If deployment fails with unhealthy containers:

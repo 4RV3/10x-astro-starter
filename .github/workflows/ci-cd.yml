@@ -147,6 +147,7 @@ jobs:
             docker-compose.production.yml \
             deploy.sh \
             cleanup.sh \
+            load-env.sh \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/10xcards/
           
           # Copy docker directory (Supabase config)
@@ -184,6 +185,10 @@ jobs:
         run: |
           ssh -p ${{ secrets.VPS_SSH_PORT }} ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd /opt/10xcards
+            
+            # Load env vars
+            source ./load-env.sh
+            
             docker compose -f docker-compose.production.yml ps
             
             # Wait for health check
