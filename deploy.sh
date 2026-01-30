@@ -44,6 +44,19 @@ echo "🔐 Loading environment variables..."
 set -a  # automatically export all variables
 source secrets/supabase.env
 source secrets/app.env
+
+# Set DOCKER_IMAGE if not already set (for manual runs)
+if [ -z "$DOCKER_IMAGE" ]; then
+  # Try to detect from GitHub repository or use default
+  if [ -n "$GITHUB_REPOSITORY" ]; then
+    DOCKER_IMAGE="ghcr.io/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):latest"
+  else
+    # Default fallback for manual deployment
+    DOCKER_IMAGE="ghcr.io/4rv3/10x-astro-starter:latest"
+  fi
+  echo "📦 Using Docker image: $DOCKER_IMAGE"
+fi
+
 set +a
 
 # Pull latest image
