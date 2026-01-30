@@ -5,7 +5,7 @@ ARG NODE_VERSION=22.14.0
 FROM node:${NODE_VERSION}-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --fund=false
+RUN npm ci --legacy-peer-deps --no-audit --fund=false
 
 FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /app
@@ -21,7 +21,7 @@ ENV NODE_ENV=production \
 
 # Install only production deps for the standalone server.
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --no-audit --fund=false && npm cache clean --force
+RUN npm ci --legacy-peer-deps --omit=dev --no-audit --fund=false && npm cache clean --force
 
 # Copy built output (Astro Node adapter - standalone)
 COPY --from=build /app/dist ./dist
