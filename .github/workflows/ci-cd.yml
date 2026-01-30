@@ -172,6 +172,7 @@ jobs:
             
             # Set GITHUB_REPOSITORY for docker-compose
             export GITHUB_REPOSITORY="${{ github.repository }}"
+            export DOCKER_IMAGE="ghcr.io/$(echo $GITHUB_REPOSITORY | tr '[:upper:]' '[:lower:]'):latest"
             
             # Run deployment script
             chmod +x deploy.sh
