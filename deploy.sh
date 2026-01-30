@@ -6,9 +6,34 @@ echo "🚀 Starting deployment..."
 # Variables
 DEPLOY_PATH="/opt/10xcards"
 COMPOSE_FILE="docker-compose.production.yml"
+CLEAN_DEPLOY=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --clean)
+      CLEAN_DEPLOY=true
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [--clean]"
+      echo "  --clean: Remove all containers and volumes before deployment"
+      exit 1
+      ;;
+  esac
+done
 
 # Navigate to deployment directory
 cd "$DEPLOY_PATH"
+
+# Clean deployment if requested
+if [ "$CLEAN_DEPLOY" = true ]; then
+  echo "🧹 Cleaning all containers and volumes..."
+  docker compose -f "$COMPOSE_FILE" down -v 2>/dev/null || true
+  docker volume ls -q | grep -E '10xcards|supabase' | xargs -r docker volume rm 2>/dev/null || true
+  echo "✅ Cleanup complete"
+fi
 
 # Check if secrets exist
 if [ ! -f "secrets/supabase.env" ] || [ ! -f "secrets/app.env" ]; then
