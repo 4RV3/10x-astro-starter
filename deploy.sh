@@ -39,6 +39,13 @@ fi
 
 echo "✅ Secrets validated"
 
+# Load environment variables for docker-compose interpolation
+echo "🔐 Loading environment variables..."
+set -a  # automatically export all variables
+source secrets/supabase.env
+source secrets/app.env
+set +a
+
 # Pull latest image
 echo "📦 Pulling latest Docker image..."
 docker compose -f "$COMPOSE_FILE" pull app
