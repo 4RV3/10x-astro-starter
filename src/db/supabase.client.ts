@@ -5,15 +5,9 @@ import type { AstroCookies } from "astro";
 import type { Database } from "../db/database.types.ts";
 
 // In production (Docker), use process.env; in development use import.meta.env
-const supabaseUrl = import.meta.env.PROD 
-  ? process.env.SUPABASE_URL 
-  : import.meta.env.SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PROD
-  ? process.env.SUPABASE_KEY
-  : import.meta.env.SUPABASE_KEY;
-const supabaseServiceKey = import.meta.env.PROD
-  ? process.env.SUPABASE_SERVICE_ROLE_KEY
-  : (import.meta.env as any).SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = import.meta.env.PROD ? process.env.SUPABASE_URL : import.meta.env.SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.PROD ? process.env.SUPABASE_KEY : import.meta.env.SUPABASE_KEY;
+const supabaseServiceKey = import.meta.env.PROD ? process.env.SUPABASE_SERVICE_ROLE_KEY : (import.meta.env as any).SUPABASE_SERVICE_ROLE_KEY;
 
 // Admin client (server-side only)
 export const adminSupabaseClient = createClient<Database>(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
