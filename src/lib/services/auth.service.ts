@@ -53,6 +53,8 @@ export async function login(supabase: SupabaseClient, body: unknown): Promise<Lo
   }
   const { username, password } = parsed.data;
 
+  console.log("[AUTH] Login attempt for username:", username);
+
   // Username lookup must bypass RLS (user is not authenticated yet)
   const serviceKey = import.meta.env.PROD
     ? process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -65,6 +67,8 @@ export async function login(supabase: SupabaseClient, body: unknown): Promise<Lo
     };
   }
 
+  console.log("[AUTH] Service key present:", !!serviceKey);
+
   const { adminSupabaseClient } = await import("../../db/supabase.client.ts");
 
   const { data: profile, error: profileError } = await adminSupabaseClient
@@ -74,6 +78,7 @@ export async function login(supabase: SupabaseClient, body: unknown): Promise<Lo
     .single();
 
   if (profileError || !profile) {
+    console.error("[AUTH] Profile lookup failed:", { username, profileError, hasProfile: !!profile });
     throw { status: 401, error: "INVALID_CREDENTIALS", message: "Invalid username or password" };
   }
 
