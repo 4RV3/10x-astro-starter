@@ -54,7 +54,7 @@ export async function login(supabase: SupabaseClient, body: unknown): Promise<Lo
   const { username, password } = parsed.data;
 
   // Username lookup must bypass RLS (user is not authenticated yet)
-  const serviceKey = (import.meta as any).env?.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = import.meta.env.PROD ? process.env.SUPABASE_SERVICE_ROLE_KEY : (import.meta as any).env?.SUPABASE_SERVICE_ROLE_KEY;
   if (!serviceKey) {
     throw {
       status: 500,

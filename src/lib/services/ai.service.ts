@@ -15,8 +15,8 @@ export async function generateCards(supabase: SupabaseClient, body: unknown): Pr
     throw { status: 401, error: "UNAUTHORIZED", message: "Authentication required" };
   }
 
-  const apiKey = import.meta.env.OPENROUTER_API_KEY;
-  const model = import.meta.env.OPENROUTER_MODEL || "allenai/molmo-2-8b:free";
+  const apiKey = import.meta.env.PROD ? process.env.OPENROUTER_API_KEY : import.meta.env.OPENROUTER_API_KEY;
+  const model = import.meta.env.PROD ? process.env.OPENROUTER_MODEL || "allenai/molmo-2-8b:free" : import.meta.env.OPENROUTER_MODEL || "allenai/molmo-2-8b:free";
   if (!apiKey) {
     throw { status: 500, error: "AI_CONFIG_ERROR", message: "Missing OpenRouter API key" };
   }
